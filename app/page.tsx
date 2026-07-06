@@ -9,7 +9,7 @@ import ContactSection from '@/components/contact-section'
 import VisitorCounter from '@/components/visitor-counter'
 
 /* ────────────────────────────────────────────────
-   K2S Bhai — web3 community operator · portfolio
+   K2S Bhai — Web3 Community Manager · Portfolio
    premium retro-terminal edition
    ──────────────────────────────────────────────── */
 
@@ -173,26 +173,24 @@ export default function Page() {
           <section className="sec" id="sec1" data-idx="1">
             <div className="sec-inner">
               <pre className="ascii-header fade-row">{`┌──────────────────────────────────┐
-│  PROFILE  //  k2s bhai           │
+│  PROFILE - K2S          │
 └──────────────────────────────────┘`}</pre>
               <div className="profile-head fade-row">
-                <img src="/k2s.png" alt="k2s bhai avatar" className="profile-av" />
+                <img src="/k2s.png" alt="K2S avatar" className="profile-av" />
                 <div>
-                  <h1 className="profile-name">k2s bhai</h1>
+                  <h1 className="profile-name">K2S</h1>
                   <p className="profile-tagline" aria-label={TAGLINE}>
                     {typed}
                     <span className="blink-cursor">_</span>
                   </p>
                   <p className="profile-status">
                     <span className="status-dot" />
-                    available for hire
+                    Hire Me
                   </p>
                 </div>
               </div>
               <p className="hero-bio fade-row text-pretty">
-                helping web3 projects grow through community management,
-                moderation, partnerships, and strategic execution — turning
-                communities into active ecosystems.
+                Helping Web3 projects grow through community management, moderation, partnerships, and execution, with a focus on building active and engaged communities
               </p>
               <div className="hero-ctas fade-row">
                 <button type="button" className="hero-btn hero-btn-primary" onClick={() => scrollToSec(2)}>
