@@ -1101,7 +1101,21 @@ body::after {
 @media (max-width: 540px) {
   .sec {
     padding: 44px 20px;
-    padding-right: 130px;
+    padding-right: 44px;
+  }
+  /* collapse nav to pips only; show label just for the active section */
+  .sidenav {
+    right: 8px;
+    gap: 16px;
+  }
+  .nav-link .nav-label {
+    display: none;
+  }
+  .nav-link.active .nav-label {
+    display: inline;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 2px 6px;
+    border: 1px solid var(--border);
   }
   .stat-row {
     font-size: 20px;
