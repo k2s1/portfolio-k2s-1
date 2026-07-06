@@ -10,18 +10,22 @@ const DEFAULT_SERVICE_ID = 'service_m43odbp'
 const DEFAULT_TEMPLATE_ID = 'template_bin7jm7'
 const DEFAULT_PUBLIC_KEY = 'nzFZHAm13JZJGJ1Tf'
 
+// trim() guards against stray whitespace/newlines pasted into env vars,
+// which silently breaks EmailJS with invalid IDs.
+const clean = (v: string | undefined) => (v ? v.trim() : '')
+
 export async function GET() {
   const serviceId =
-    process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ||
-    process.env.EMAILJS_SERVICE_ID ||
+    clean(process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID) ||
+    clean(process.env.EMAILJS_SERVICE_ID) ||
     DEFAULT_SERVICE_ID
   const templateId =
-    process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ||
-    process.env.EMAILJS_TEMPLATE_ID ||
+    clean(process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID) ||
+    clean(process.env.EMAILJS_TEMPLATE_ID) ||
     DEFAULT_TEMPLATE_ID
   const publicKey =
-    process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ||
-    process.env.EMAILJS_PUBLIC_KEY ||
+    clean(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) ||
+    clean(process.env.EMAILJS_PUBLIC_KEY) ||
     DEFAULT_PUBLIC_KEY
 
   const configured = Boolean(serviceId && templateId && publicKey)

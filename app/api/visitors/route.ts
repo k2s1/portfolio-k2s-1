@@ -5,16 +5,22 @@ const COOKIE_NAME = 'k2s_visitor_num'
 const ONE_YEAR = 60 * 60 * 24 * 365
 
 // Accept whichever connection string the deployment provides.
-// The Neon Vercel integration sets DATABASE_URL and/or POSTGRES_URL.
+// The Neon Vercel integration may prefix variable names (e.g. littlefiref1_DATABASE_URL),
+// so scan ALL env vars and use the first Postgres connection string found.
 function getConnectionString(): string | undefined {
-  return (
+  const direct =
     process.env.DATABASE_URL ||
     process.env.POSTGRES_URL ||
-    process.env.NEON_DATABASE_URL ||
-    process.env.POSTGRES_PRISMA_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING
-  )
+    process.env.NEON_DATABASE_URL
+  if (direct) return direct
+  for (const [key, value] of Object.entries(process.env)) {
+    if (!value) continue
+    if (key.toUpperCase().includes('PRISMA')) continue
+    if (value.startsWith('postgres://') || value.startsWith('postgresql://')) {
+      return value
+    }
+  }
+  return undefined
 }
 
 let tableReady = false
