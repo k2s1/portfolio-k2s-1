@@ -4,9 +4,41 @@ import { cookies } from 'next/headers'
 const COOKIE_NAME = 'k2s_visitor_num'
 const ONE_YEAR = 60 * 60 * 24 * 365
 
+// Accept whichever connection string the deployment provides.
+// The Neon Vercel integration sets DATABASE_URL and/or POSTGRES_URL.
+function getConnectionString(): string | undefined {
+  return (
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.NEON_DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING
+  )
+}
+
+let tableReady = false
+
 export async function POST() {
   try {
-    const sql = neon(process.env.DATABASE_URL as string)
+    const conn = getConnectionString()
+    if (!conn) {
+      console.error('[visitors] no database connection string found in env')
+      return Response.json({ error: 'database not configured' }, { status: 500 })
+    }
+    const sql = neon(conn)
+
+    // Auto-create the table on first use so any fresh Neon database works.
+    if (!tableReady) {
+      await sql`
+        CREATE TABLE IF NOT EXISTS visitor_counter (
+          id INT PRIMARY KEY,
+          total BIGINT NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `
+      tableReady = true
+    }
     const cookieStore = await cookies()
     const existing = cookieStore.get(COOKIE_NAME)
 
