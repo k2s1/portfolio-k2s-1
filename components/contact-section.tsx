@@ -2,12 +2,18 @@
 
 import { useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
+import useSWR from 'swr'
 
 const EMAIL = 'k2sbhai22@gmail.com'
 
-const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
-const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+type EmailConfig = {
+  configured: boolean
+  serviceId: string
+  templateId: string
+  publicKey: string
+}
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json() as Promise<EmailConfig>)
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
@@ -25,7 +31,10 @@ export default function ContactSection() {
   const [values, setValues] = useState({ name: '', email: '', message: '' })
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const configured = Boolean(SERVICE_ID && TEMPLATE_ID && PUBLIC_KEY)
+  // load emailjs config at runtime from the server (never relies on build-time env inlining)
+  const { data: config } = useSWR<EmailConfig>('/api/contact-config', fetcher, {
+    revalidateOnFocus: false,
+  })
 
   const validate = (): boolean => {
     const next: FieldErrors = {}
@@ -53,26 +62,30 @@ export default function ContactSection() {
     if (status === 'sending') return
     if (!validate()) return
 
-    if (!configured) {
-      // graceful fallback: open the user's mail client with the drafted message
-      const subject = encodeURIComponent(`portfolio inquiry from ${values.name.trim()}`)
-      const body = encodeURIComponent(`${values.message.trim()}\n\n— ${values.name.trim()} (${values.email.trim()})`)
-      window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`
-      return
-    }
-
     setStatus('sending')
     try {
+      // fetch fresh config if SWR hasn't resolved yet
+      const cfg = config ?? (await fetcher('/api/contact-config'))
+      if (!cfg?.configured) {
+        throw new Error('email service not configured')
+      }
+
+      // template params match the EmailJS "Contact Us" + "Auto-Reply" templates:
+      // {{name}}, {{email}}, {{title}}, {{message}}, {{time}}
       await emailjs.send(
-        SERVICE_ID as string,
-        TEMPLATE_ID as string,
+        cfg.serviceId,
+        cfg.templateId,
         {
-          from_name: values.name.trim(),
-          reply_to: values.email.trim(),
+          name: values.name.trim(),
+          email: values.email.trim(),
+          title: `portfolio inquiry from ${values.name.trim()}`,
           message: values.message.trim(),
-          to_email: EMAIL,
+          time: new Date().toLocaleString('en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }),
         },
-        { publicKey: PUBLIC_KEY as string },
+        { publicKey: cfg.publicKey },
       )
       setStatus('success')
       setValues({ name: '', email: '', message: '' })
