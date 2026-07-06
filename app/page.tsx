@@ -1,18 +1,25 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import PixelRain from '@/components/pixel-rain'
+import IntroScreen from '@/components/intro-screen'
+import FeedbackGallery from '@/components/feedback-gallery'
+import FeaturedPosts from '@/components/featured-posts'
+import ContactSection from '@/components/contact-section'
+import VisitorCounter from '@/components/visitor-counter'
 
 /* ────────────────────────────────────────────────
-   K2S — web3 operator · portfolio
-   design ported from the qurool retro-terminal template
+   K2S Bhai — web3 community operator · portfolio
+   premium retro-terminal edition
    ──────────────────────────────────────────────── */
 
 const NAV_ITEMS = [
   { s: 1, label: '[ profile ]' },
   { s: 2, label: '[ work ]' },
   { s: 3, label: '[ team feedback ]' },
-  { s: 4, label: '[ main skills ]' },
-  { s: 5, label: '[ contact me ]' },
+  { s: 4, label: '[ featured posts ]' },
+  { s: 5, label: '[ main skills ]' },
+  { s: 6, label: '[ contact me ]' },
 ]
 
 const WORK = [
@@ -42,240 +49,35 @@ const WORK = [
   },
 ]
 
-const FEEDBACK = [
-  { img: '/seismicteamfeedback.png', name: '> seismic team feedback' },
-  { img: '/zamateamfeedback.png', name: '> zama team feedback' },
-]
-
 const SKILLS = [
-  '├── discord moderation & server ops',
-  '├── telegram community management',
-  '├── community growth & engagement',
-  '├── web3 ecosystem operations',
-  '└── building cultures, not just crowds',
+  { name: 'discord moderation & server ops', level: 10 },
+  { name: 'telegram community management', level: 10 },
+  { name: 'community growth & engagement', level: 9 },
+  { name: 'partnerships & collabs', level: 8 },
+  { name: 'web3 ecosystem operations', level: 9 },
 ]
 
-const SCRAMBLE_CHARS = '!@#$%^&*()_+-=[]{}|;:<>?/~`░▒▓█'
-const FINAL_TEXT = 'enter'
+const TAGLINE = 'builds communities. drives engagement.'
 
 export default function Page() {
   const [entered, setEntered] = useState(false)
   const [activeSec, setActiveSec] = useState(1)
   const [modalKey, setModalKey] = useState<string | null>(null)
+  const [typed, setTyped] = useState('')
 
-  const rainRef = useRef<HTMLCanvasElement>(null)
-  const burstRef = useRef<HTMLCanvasElement>(null)
   const scrollerRef = useRef<HTMLDivElement>(null)
-  const enterTextRef = useRef<HTMLSpanElement>(null)
-  const scrambleRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const enteredRef = useRef(false)
 
-  /* ── ascii character rain ── */
+  /* ── typewriter tagline after entering ── */
   useEffect(() => {
-    const rain = rainRef.current
-    if (!rain) return
-    const rCtx = rain.getContext('2d')
-    if (!rCtx) return
-
-    const CHARSET =
-      '!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\\\'"'
-    const CHAR_COUNT = 350
-    let chars: {
-      x: number
-      y: number
-      ch: string
-      sz: number
-      a: number
-      ta: number
-      sp: number
-      cd: number
-      rc: number
-    }[] = []
-    let raf = 0
-
-    function sizeRain() {
-      rain!.width = window.innerWidth
-      rain!.height = window.innerHeight
-    }
-    function seedChars() {
-      chars = []
-      for (let i = 0; i < CHAR_COUNT; i++) {
-        chars.push({
-          x: Math.random() * rain!.width,
-          y: Math.random() * rain!.height,
-          ch: CHARSET[Math.floor(Math.random() * CHARSET.length)],
-          sz: 10 + Math.floor(Math.random() * 14),
-          a: Math.random(),
-          ta: Math.random(),
-          sp: 0.01 + Math.random() * 0.03,
-          cd: (Math.random() * 60) | 0,
-          rc: (Math.random() * 200) | 0,
-        })
-      }
-    }
-    function loopRain() {
-      rCtx!.clearRect(0, 0, rain!.width, rain!.height)
-      for (let i = 0; i < chars.length; i++) {
-        const c = chars[i]
-        if (Math.abs(c.a - c.ta) < 0.02) {
-          if (c.cd > 0) c.cd--
-          else {
-            c.ta = Math.random()
-            c.cd = (Math.random() * 60) | 0
-          }
-        }
-        c.a += (c.ta - c.a) * c.sp
-        c.rc--
-        if (c.rc <= 0) {
-          c.ch = CHARSET[Math.floor(Math.random() * CHARSET.length)]
-          c.rc = (80 + Math.random() * 200) | 0
-        }
-        rCtx!.font = c.sz + 'px W95FA, Courier New, monospace'
-        rCtx!.fillStyle = 'rgba(255,255,255,' + c.a.toFixed(3) + ')'
-        rCtx!.fillText(c.ch, c.x | 0, c.y | 0)
-      }
-      raf = requestAnimationFrame(loopRain)
-    }
-    const onResize = () => {
-      sizeRain()
-      seedChars()
-    }
-    sizeRain()
-    seedChars()
-    loopRain()
-    window.addEventListener('resize', onResize)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', onResize)
-    }
-  }, [])
-
-  /* ── ascii fill → fade reveal transition ── */
-  const doCharFadeReveal = useCallback(() => {
-    const burstC = burstRef.current
-    if (!burstC) return
-    const bCtx = burstC.getContext('2d')
-    if (!bCtx) return
-
-    burstC.width = window.innerWidth
-    burstC.height = window.innerHeight
-    burstC.classList.add('active')
-
-    const W = burstC.width
-    const H = burstC.height
-    const CELL = 16
-    const FILL_CHARS =
-      '!@#$%^&*()_+-=[]{}|;:,.<>?/~`░▒▓█0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    const duration = 1800
-    const startTime = performance.now()
-    let frameCount = 0
-
-    const grid: {
-      x: number
-      y: number
-      ch: string
-      changeTick: number
-      fadeStart: number
-      fadeEnd: number
-    }[] = []
-    for (let gy = 0; gy < H + CELL; gy += CELL) {
-      for (let gx = 0; gx < W + CELL; gx += CELL) {
-        const fadeStart = 0.1 + Math.random() * 0.55
-        const fadeDur = 0.15 + Math.random() * 0.25
-        grid.push({
-          x: gx,
-          y: gy,
-          ch: FILL_CHARS[Math.floor(Math.random() * FILL_CHARS.length)],
-          changeTick: 1 + Math.floor(Math.random() * 3),
-          fadeStart,
-          fadeEnd: fadeStart + fadeDur,
-        })
-      }
-    }
-
-    function animReveal(now: number) {
-      const elapsed = now - startTime
-      const rawP = Math.min(elapsed / duration, 1)
-      frameCount++
-
-      bCtx!.clearRect(0, 0, W, H)
-      const bgAlpha = rawP < 0.5 ? 1 : 1 - (rawP - 0.5) / 0.5
-      bCtx!.fillStyle = 'rgba(0,0,0,' + bgAlpha.toFixed(3) + ')'
-      bCtx!.fillRect(0, 0, W, H)
-
-      let anyAlive = false
-      for (let i = 0; i < grid.length; i++) {
-        const gc = grid[i]
-        let alpha: number
-        if (rawP < gc.fadeStart) alpha = 0.4
-        else if (rawP < gc.fadeEnd)
-          alpha = 0.4 * (1 - (rawP - gc.fadeStart) / (gc.fadeEnd - gc.fadeStart))
-        else alpha = 0
-
-        if (alpha < 0.01) continue
-        anyAlive = true
-
-        if (frameCount % gc.changeTick === 0) {
-          gc.ch = FILL_CHARS[Math.floor(Math.random() * FILL_CHARS.length)]
-        }
-
-        bCtx!.globalAlpha = alpha
-        bCtx!.font = CELL + 'px W95FA, Courier New, monospace'
-        bCtx!.fillStyle = '#fff'
-        bCtx!.fillText(gc.ch, gc.x, gc.y)
-      }
-      bCtx!.globalAlpha = 1
-
-      if (anyAlive && rawP < 1) requestAnimationFrame(animReveal)
-      else burstC!.classList.remove('active')
-    }
-    requestAnimationFrame(animReveal)
-  }, [])
-
-  /* ── enter trigger ── */
-  const triggerEnter = useCallback(() => {
-    if (enteredRef.current) return
-    enteredRef.current = true
-    setEntered(true)
-    doCharFadeReveal()
-  }, [doCharFadeReveal])
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') triggerEnter()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [triggerEnter])
-
-  /* ── enter text scramble on hover ── */
-  const onEnterHover = () => {
-    const el = enterTextRef.current
-    if (!el) return
-    let frame = 0
-    const maxFrames = 12
-    if (scrambleRef.current) clearInterval(scrambleRef.current)
-    scrambleRef.current = setInterval(() => {
-      let result = ''
-      for (let i = 0; i < FINAL_TEXT.length; i++) {
-        if (frame >= maxFrames - 2 || Math.random() < frame / maxFrames) {
-          result += FINAL_TEXT[i]
-        } else {
-          result += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
-        }
-      }
-      el.textContent = result
-      frame++
-      if (frame >= maxFrames) {
-        if (scrambleRef.current) clearInterval(scrambleRef.current)
-        el.textContent = FINAL_TEXT
-      }
-    }, 50)
-  }
-  const onEnterLeave = () => {
-    if (scrambleRef.current) clearInterval(scrambleRef.current)
-    if (enterTextRef.current) enterTextRef.current.textContent = FINAL_TEXT
-  }
+    if (!entered) return
+    let i = 0
+    const t = setInterval(() => {
+      i++
+      setTyped(TAGLINE.slice(0, i))
+      if (i >= TAGLINE.length) clearInterval(t)
+    }, 42)
+    return () => clearInterval(t)
+  }, [entered])
 
   /* ── scroll-driven fade + active nav ── */
   useEffect(() => {
@@ -346,30 +148,9 @@ export default function Page() {
 
   return (
     <main>
-      <canvas id="pixelRain" ref={rainRef} aria-hidden="true" />
+      <PixelRain />
 
-      {/* ═══ INTRO — ENTER SCREEN ═══ */}
-      <div id="intro" className={`intro${entered ? '' : ' active'}`}>
-        <div className="enter-wrap">
-          <img src="/animation.gif" alt="" className="enter-gif" />
-          <button
-            type="button"
-            className="enter-box"
-            onMouseEnter={onEnterHover}
-            onMouseLeave={onEnterLeave}
-            onClick={triggerEnter}
-          >
-            <span className="enter-text" ref={enterTextRef}>
-              enter
-            </span>
-          </button>
-          <p className="enter-hint">
-            press enter to continue<span className="blink-cursor">_</span>
-          </p>
-        </div>
-      </div>
-
-      <canvas id="burstCanvas" ref={burstRef} aria-hidden="true" />
+      <IntroScreen entered={entered} onEnter={() => setEntered(true)} />
 
       {/* ═══ PORTFOLIO ═══ */}
       <div id="portfolio" className={`portfolio${entered ? ' show' : ''}`}>
@@ -388,37 +169,40 @@ export default function Page() {
         </nav>
 
         <div className="scroller" ref={scrollerRef}>
-          {/* 1 — profile */}
+          {/* 1 — profile / hero */}
           <section className="sec" id="sec1" data-idx="1">
             <div className="sec-inner">
               <pre className="ascii-header fade-row">{`┌──────────────────────────────────┐
-│  PROFILE  //  k2s                │
+│  PROFILE  //  k2s bhai           │
 └──────────────────────────────────┘`}</pre>
               <div className="profile-head fade-row">
-                <img src="/k2s.png" alt="k2s avatar" className="profile-av" />
+                <img src="/k2s.png" alt="k2s bhai avatar" className="profile-av" />
                 <div>
-                  <h1 className="profile-name">k2s</h1>
-                  <p className="profile-role">web3 operator</p>
+                  <h1 className="profile-name">k2s bhai</h1>
+                  <p className="profile-tagline" aria-label={TAGLINE}>
+                    {typed}
+                    <span className="blink-cursor">_</span>
+                  </p>
                   <p className="profile-status">
                     <span className="status-dot" />
-                    available now
+                    available for hire
                   </p>
                 </div>
               </div>
-              <ul className="stats">
-                <li className="stat-row fade-row">
-                  <span className="stat-sep">::</span>
-                  <span className="stat-txt">community manager</span>
-                </li>
-                <li className="stat-row fade-row">
-                  <span className="stat-sep">::</span>
-                  <span className="stat-txt">discord mod</span>
-                </li>
-                <li className="stat-row fade-row">
-                  <span className="stat-sep">::</span>
-                  <span className="stat-txt">telegram ops</span>
-                </li>
-              </ul>
+              <p className="hero-bio fade-row text-pretty">
+                helping web3 projects grow through community management,
+                moderation, partnerships, and strategic execution — turning
+                communities into active ecosystems.
+              </p>
+              <div className="hero-ctas fade-row">
+                <button type="button" className="hero-btn hero-btn-primary" onClick={() => scrollToSec(2)}>
+                  [ view work ]
+                </button>
+                <button type="button" className="hero-btn" onClick={() => scrollToSec(6)}>
+                  [ contact me ]
+                </button>
+              </div>
+              <VisitorCounter variant="block" />
               <pre className="ascii-footer fade-row">
                 ════════════════════════════════════
               </pre>
@@ -435,7 +219,7 @@ export default function Page() {
                 {WORK.map((w) => (
                   <div key={w.key} className="card fade-row">
                     <div className="card-img-wrap">
-                      <img src={w.img} alt={w.title} className="card-img" />
+                      <img src={w.img || '/placeholder.svg'} alt={w.title} className="card-img" />
                     </div>
                     <div className="card-content">
                       <h3 className="card-title">{w.title}</h3>
@@ -464,76 +248,49 @@ export default function Page() {
               <pre className="ascii-header fade-row">{`┌──────────────────────────────────┐
 │  TEAM FEEDBACK  //  receipts     │
 └──────────────────────────────────┘`}</pre>
-              <div className="products-grid">
-                {FEEDBACK.map((f) => (
-                  <div key={f.img} className="product-card fade-row">
-                    <div className="product-img-wrap">
-                      <img src={f.img} alt={f.name} className="product-img" />
-                    </div>
-                    <p className="product-name">{f.name}</p>
-                  </div>
-                ))}
-              </div>
+              <FeedbackGallery />
             </div>
           </section>
 
-          {/* 4 — main skills */}
+          {/* 4 — featured posts */}
           <section className="sec" id="sec4" data-idx="4">
+            <div className="sec-inner">
+              <pre className="ascii-header fade-row">{`┌──────────────────────────────────┐
+│  FEATURED POSTS  //  on x        │
+└──────────────────────────────────┘`}</pre>
+              <FeaturedPosts />
+            </div>
+          </section>
+
+          {/* 5 — main skills */}
+          <section className="sec" id="sec5" data-idx="5">
             <div className="sec-inner">
               <pre className="ascii-header fade-row">{`┌──────────────────────────────────┐
 │  MAIN SKILLS  //  capabilities   │
 └──────────────────────────────────┘`}</pre>
               <ul className="skills-list">
                 {SKILLS.map((s) => (
-                  <li key={s} className="skill-row fade-row">
-                    {s}
+                  <li key={s.name} className="skill-row fade-row">
+                    <span className="skill-bar" aria-hidden="true">
+                      [{'█'.repeat(s.level)}{'░'.repeat(10 - s.level)}]
+                    </span>
+                    <span className="skill-name">{s.name}</span>
                   </li>
                 ))}
               </ul>
+              <p className="skills-note fade-row">
+                └── building cultures, not just crowds
+              </p>
             </div>
           </section>
 
-          {/* 5 — contact */}
-          <section className="sec" id="sec5" data-idx="5">
+          {/* 6 — contact */}
+          <section className="sec" id="sec6" data-idx="6">
             <div className="sec-inner">
               <pre className="ascii-header fade-row">{`┌──────────────────────────────────┐
 │  CONTACT ME  //  channels        │
 └──────────────────────────────────┘`}</pre>
-              <div className="contact-block fade-row">
-                <p className="contact-row">
-                  <span className="ct-prompt">{'>'}</span>
-                  <a
-                    href="https://x.com/k2sbhai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="clink"
-                  >
-                    x
-                  </a>
-                  <span className="sep">/</span>
-                  <a
-                    href="https://t.me/k2sbhai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="clink"
-                  >
-                    telegram
-                  </a>
-                  <span className="sep">/</span>
-                  <a
-                    href="https://github.com/k2s1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="clink"
-                  >
-                    github
-                  </a>
-                </p>
-              </div>
-              <p className="contact-note fade-row">
-                available for community operations, moderation roles, and web3
-                project collaborations. reach out directly — i respond fast.
-              </p>
+              <ContactSection />
               <pre className="ascii-footer fade-row">
                 ════════════════════════════════════
               </pre>

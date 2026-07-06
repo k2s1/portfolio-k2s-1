@@ -3,9 +3,9 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: "k2s // web3 operator",
+  title: 'k2s bhai // web3 community operator',
   description:
-    'k2s — web3 operator. community manager, discord mod, telegram ops. worked with seismic and zama.',
+    'k2s bhai — builds communities. drives engagement. helping web3 projects grow through community management, moderation, partnerships, and strategic execution. worked with seismic and zama.',
   generator: 'v0.app',
   icons: {
     icon: [
