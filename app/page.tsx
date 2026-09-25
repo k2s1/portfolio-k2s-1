@@ -190,7 +190,7 @@ export default function Page() {
                 </div>
               </div>
               <p className="hero-bio fade-row text-pretty">
-                Helping Web3 projects grow through community management, moderation, partnerships, and execution, with a focus on building active and engaged communities
+                Helping Web3 and AI projects grow through community management, moderation, partnerships, and execution, while testing new AI models, benchmarking performance, comparing tools, and sharing useful free AI resources with the community
               </p>
               <div className="hero-ctas fade-row">
                 <button type="button" className="hero-btn hero-btn-primary" onClick={() => scrollToSec(2)}>
