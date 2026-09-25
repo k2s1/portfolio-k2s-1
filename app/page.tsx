@@ -50,14 +50,14 @@ const WORK = [
 ]
 
 const SKILLS = [
-  { name: 'discord moderation & server ops', level: 10 },
-  { name: 'telegram community management', level: 10 },
-  { name: 'community growth & engagement', level: 9 },
-  { name: 'partnerships & collabs', level: 8 },
-  { name: 'web3 ecosystem operations', level: 9 },
+  { name: 'Discord moderation & server ops', level: 10 },
+  { name: 'AI Content Creation', level: 10 },
+  { name: 'Growth Lead AI & Web3', level: 9 },
+  { name: 'Promo & Collabs', level: 8 },
+  { name: 'AI Model Testing', level: 9 },
 ]
 
-const TAGLINE = 'builds communities. drives engagement.'
+const TAGLINE = 'growth lead | ai creator | web3'
 
 export default function Page() {
   const [entered, setEntered] = useState(false)
