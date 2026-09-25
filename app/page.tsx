@@ -9,7 +9,7 @@ import ContactSection from '@/components/contact-section'
 import VisitorCounter from '@/components/visitor-counter'
 
 /* ────────────────────────────────────────────────
-   K2S Bhai — Web3 Community Manager · Portfolio
+   K2S Bhai — AI & Web3 Creator · Community Manager
    premium retro-terminal edition
    ──────────────────────────────────────────────── */
 
