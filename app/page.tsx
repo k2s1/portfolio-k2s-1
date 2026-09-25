@@ -50,11 +50,11 @@ const WORK = [
 ]
 
 const SKILLS = [
-  { name: 'Discord moderation & server ops', level: 10 },
-  { name: 'AI Content Creation', level: 10 },
-  { name: 'Growth Lead AI & Web3', level: 9 },
-  { name: 'Promo & Collabs', level: 8 },
-  { name: 'AI Model Testing', level: 9 },
+  { name: 'Growth Strategy', level: 10 },
+  { name: 'Community Management', level: 10 },
+  { name: 'Partnerships & BD', level: 9 },
+  { name: 'AI Content & Model Testing', level: 8 },
+  { name: 'Content Strategy', level: 9 },
 ]
 
 const TAGLINE = 'growth lead | ai creator | web3'
