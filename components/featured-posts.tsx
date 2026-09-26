@@ -9,9 +9,9 @@ const POSTS = [
     url: 'https://x.com/k2sbhai/status/2102487953302061481',
   },
   {
-    id: '1951554251722785128',
-    label: 'seismic',
-    url: 'https://x.com/k2sbhai/status/1951554251722785128',
+    id: '2103509769512489201',
+    label: 'Nvidia',
+    url: 'https://x.com/k2sbhai/status/2103509769512489201',
   },
   {
     id: '2001659139869806974',
