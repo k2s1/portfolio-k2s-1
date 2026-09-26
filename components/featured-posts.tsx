@@ -14,9 +14,9 @@ const POSTS = [
     url: 'https://x.com/k2sbhai/status/2103509769512489201',
   },
   {
-    id: '2102442330582294723',
-    label: 'DigitalOcean',
-    url: 'https://x.com/k2sbhai/status/2102442330582294723',
+    id: '2101657436696547773',
+    label: 'Jev',
+    url: 'https://x.com/k2sbhai/status/2101657436696547773',
   },
 ]
 
