@@ -4,9 +4,9 @@ import { Tweet, TweetSkeleton } from 'react-tweet'
 
 const POSTS = [
   {
-    id: '2071981082594210054',
-    label: 'nvidia — free api',
-    url: 'https://x.com/k2sbhai/status/2071981082594210054',
+    id: '2102487953302061481',
+    label: 'Claude Opus 5.5 vs Fable 5.1 vs GPT-Astra 6',
+    url: 'https://x.com/k2sbhai/status/2102487953302061481',
   },
   {
     id: '1951554251722785128',
