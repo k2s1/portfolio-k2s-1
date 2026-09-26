@@ -231,8 +231,8 @@ export default function ContactSection() {
       </form>
 
       <p className="contact-note fade-row">
-        available for community operations, moderation roles, and web3 project
-        collaborations. reach out directly — i respond fast.
+        available for ai content, growth, community operations, moderation, and web3 project
+        collaborations. reach out directly on X — i respond fast
       </p>
     </div>
   )
